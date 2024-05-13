@@ -1,0 +1,27 @@
+server:
+  port: 7780
+spring:
+  application:
+    name: WebProtegeGitHubIntegrationService
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    password: guest
+    username: guest
+
+  data:
+    mongodb:
+      auto-index-creation: true
+
+webprotege:
+  rabbitmq:
+    requestqueue: webprotege-gh-integration-queue
+    responsequeue: webprotege-gh-integration-response-queue
+    timeout: 60000
+  keycloak:
+    serverUrl: http://webprotege-local.edu/auth
+    realmName: webprotege
+    clientId: admin-cli
+    clientSecret: C1MYgWgr9qpLsnNnPS3nbFNf5nGDe5H7
+    username: admin
+    password: password
