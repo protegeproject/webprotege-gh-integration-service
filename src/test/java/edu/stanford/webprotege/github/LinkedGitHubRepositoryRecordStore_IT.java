@@ -1,7 +1,9 @@
 package edu.stanford.webprotege.github;
 
-import edu.stanford.protege.github.server.GitHubRepositoryCoordinates;
 import edu.stanford.protege.webprotege.common.ProjectId;
+import edu.stanford.webprotege.github.model.GitHubRepositoryCoordinates;
+import edu.stanford.webprotege.github.persistence.LinkedGitHubRepositoryRecord;
+import edu.stanford.webprotege.github.persistence.LinkedGitHubRepositoryRecordStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,11 +11,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
+@ActiveProfiles("test")
 @SpringBootTest(properties = "webprotege.rabbitmq.commands-subscribe=false")
 @ExtendWith(MongoTestExtension.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -32,7 +34,7 @@ class LinkedGitHubRepositoryRecordStore_IT {
     void setUp() {
         projectId = ProjectId.generate();
         coords = new GitHubRepositoryCoordinates("A", "B");
-        record = new LinkedGitHubRepositoryRecord(projectId, coords);
+        record = LinkedGitHubRepositoryRecord.of(projectId, coords);
     }
 
     @AfterEach
@@ -56,7 +58,7 @@ class LinkedGitHubRepositoryRecordStore_IT {
     @Test
     void shouldOverwrite() {
         store.save(record);
-        store.save(new LinkedGitHubRepositoryRecord(projectId, new GitHubRepositoryCoordinates("C", "D")));
+        store.save(LinkedGitHubRepositoryRecord.of(projectId, new GitHubRepositoryCoordinates("C", "D")));
         assertThat(store.count()).isEqualTo(1L);
         assertThat(store.findById(projectId)).map(LinkedGitHubRepositoryRecord::repositoryCoordinates).map(GitHubRepositoryCoordinates::ownerName).hasValue("C");
         assertThat(store.findById(projectId)).map(LinkedGitHubRepositoryRecord::repositoryCoordinates).map(GitHubRepositoryCoordinates::repositoryName).hasValue("D");
@@ -67,7 +69,7 @@ class LinkedGitHubRepositoryRecordStore_IT {
         store.save(record);
         var found = store.findById(projectId);
         assertThat(found).isPresent();
-        assertThat(found).map(LinkedGitHubRepositoryRecord::projectId).hasValue(projectId);
+        assertThat(found).map(LinkedGitHubRepositoryRecord::projectId).hasValue(projectId.id());
     }
 
     @Test

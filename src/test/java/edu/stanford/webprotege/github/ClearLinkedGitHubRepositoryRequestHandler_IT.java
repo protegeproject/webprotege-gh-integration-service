@@ -1,10 +1,13 @@
 package edu.stanford.webprotege.github;
 
-import edu.stanford.protege.github.server.ClearLinkedGitHubRepositoryRequest;
-import edu.stanford.protege.github.server.GitHubRepositoryCoordinates;
-import edu.stanford.protege.github.server.LinkedGitHubRepositoryChangedEvent;
 import edu.stanford.protege.webprotege.common.ProjectId;
 import edu.stanford.protege.webprotege.ipc.EventDispatcher;
+import edu.stanford.webprotege.github.handler.ClearLinkedGitHubRepositoryRequestHandler;
+import edu.stanford.webprotege.github.message.ClearLinkedGitHubRepositoryRequest;
+import edu.stanford.webprotege.github.message.LinkedGitHubRepositoryChangedEvent;
+import edu.stanford.webprotege.github.model.GitHubRepositoryCoordinates;
+import edu.stanford.webprotege.github.persistence.LinkedGitHubRepositoryRecord;
+import edu.stanford.webprotege.github.persistence.LinkedGitHubRepositoryRecordStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,6 +30,7 @@ import static org.mockito.Mockito.verify;
  * Stanford Center for Biomedical Informatics Research
  * 2024-05-13
  */
+@ActiveProfiles("test")
 @SpringBootTest(properties = "webprotege.rabbitmq.commands-subscribe=false")
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(MongoTestExtension.class)
@@ -53,7 +57,7 @@ public class ClearLinkedGitHubRepositoryRequestHandler_IT {
     void setUp() {
         handler = new ClearLinkedGitHubRepositoryRequestHandler(store, eventDispatcher);
         projectId = ProjectId.generate();
-        store.save(new LinkedGitHubRepositoryRecord(projectId, new GitHubRepositoryCoordinates("A", "B")));
+        store.save(LinkedGitHubRepositoryRecord.of(projectId, new GitHubRepositoryCoordinates("A", "B")));
     }
 
     @AfterEach

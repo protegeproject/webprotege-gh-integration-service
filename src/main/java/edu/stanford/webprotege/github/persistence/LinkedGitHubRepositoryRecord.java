@@ -1,8 +1,8 @@
-package edu.stanford.webprotege.github;
+package edu.stanford.webprotege.github.persistence;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.stanford.protege.github.server.GitHubRepositoryCoordinates;
 import edu.stanford.protege.webprotege.common.ProjectId;
+import edu.stanford.webprotege.github.model.GitHubRepositoryCoordinates;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,9 +12,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * Stanford Center for Biomedical Informatics Research
  * 2023-10-20
  */
-@Document(collection = "LinkedGitHubRepositoryRecords")
-public record LinkedGitHubRepositoryRecord(@Id @Indexed @JsonProperty("projectId") ProjectId projectId,
+@Document(collection = "LinkedGitHubRepositories")
+public record LinkedGitHubRepositoryRecord(@Id @Indexed @JsonProperty("projectId") String projectId,
                                            @JsonProperty("repositoryCoordinates") GitHubRepositoryCoordinates repositoryCoordinates) {
 
-
+    public static LinkedGitHubRepositoryRecord of(ProjectId projectId, GitHubRepositoryCoordinates repositoryCoordinates) {
+        return new LinkedGitHubRepositoryRecord(projectId.id(), repositoryCoordinates);
+    }
 }

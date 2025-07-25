@@ -1,4 +1,4 @@
-package edu.stanford.webprotege.github;
+package edu.stanford.webprotege.github.persistence;
 
 import edu.stanford.protege.webprotege.common.ProjectId;
 import org.springframework.data.repository.CrudRepository;
